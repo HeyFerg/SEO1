@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">SEO1</string>
+    <string name="addrestaurant">Add Restaurant</string>
+    <string name="restaurantname">Restaurant Name</string>
+    <string name="restaurantaddress">Address</string>
+    <string name="restaurantcuisine">Cuisine</string>
+    <string name="restaurantrating">Rating</string>
+    <string name="restaurantSubmit">Submit</string>
+    <string name="load">Load</string>
+    <string name="save">Save</string>
+    <string name="preferences">Preferences</string>
+
+
+</resources>
