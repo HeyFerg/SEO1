@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 23
+	buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.example.aaron.seo1"
         minSdkVersion 19
@@ -19,12 +20,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.0.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:23.4.0'
+
+    // comment
+    testCompile ('junit:junit:4.12')
     compile 'org.osmdroid:osmdroid-android:5.6.5@aar'
 
 }
