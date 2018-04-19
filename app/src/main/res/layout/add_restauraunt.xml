@@ -15,7 +15,6 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="numberSigned|numberDecimal"
         android:id="@+id/restNameInput"
         />
     <TextView android:layout_width="match_parent"
@@ -25,7 +24,6 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="numberSigned|numberDecimal"
         android:id="@+id/restAddressInput"/>
 
     <TextView android:layout_width="match_parent"
@@ -35,7 +33,6 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="numberSigned|numberDecimal"
         android:id="@+id/restCuisineInput"
         />
     <TextView android:layout_width="match_parent"
@@ -45,7 +42,6 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="numberSigned|numberDecimal"
         android:id="@+id/restRatingInput"/>
 
     <Button

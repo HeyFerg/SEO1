@@ -2,14 +2,12 @@ package com.example.aaron.seo1;
 
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.app.Activity;
 import android.location.LocationManager;
 import android.location.LocationListener;
 import android.location.Location;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 
 
 //import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -44,23 +41,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener
 
     public void onLocationChanged(Location newLoc)
     {
-        Toast.makeText(this, "Location=" + newLoc.getLatitude()+ "" + newLoc.getLongitude(), Toast.LENGTH_LONG).show();
         mv.getController().setCenter(new GeoPoint(newLoc));
     }
 
     public void onProviderDisabled(String provider)
     {
-        Toast.makeText(this, "Provider" + provider + "disabled", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Provider" + provider + "disabled", Toast.LENGTH_LONG).show();
     }
 
     public void onProviderEnabled(String provider)
     {
-        Toast.makeText(this, "Provider" + provider + "enabled", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Provider" + provider + "enabled", Toast.LENGTH_LONG).show();
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras)
     {
-        Toast.makeText(this, "Status changed:" + status, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Status changed:" + status, Toast.LENGTH_LONG).show();
     }
 
 
@@ -72,11 +68,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener
     }
 
 
-    public boolean onOptionsItemsSelected(MenuItem item)
+    public boolean onOptionsItemSelected(MenuItem item)
     {
         if(item.getItemId() == R.id.addrestaurant)
         {
-            Intent intent = new Intent(this, RestaurauntActivity.class);
+            Intent intent = new Intent(this, RestaurantActivity.class);
             startActivityForResult(intent, 0 );
             return true;
         }
