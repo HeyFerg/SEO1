@@ -15,7 +15,17 @@ import android.location.LocationListener;
 import android.location.Location;
 import android.content.Context;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import android.os.Environment;
+import android.app.AlertDialog;
+
 
 
 import org.osmdroid.config.Configuration;
@@ -46,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         mv = (MapView)findViewById(R.id.map1);
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
+        mv.getController().setCenter(new GeoPoint(50.91, -1.396));
 
 
         markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -114,12 +125,55 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         }
         if(item.getItemId() == R.id.load)
         {
+            try
+            {
+                BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv"));
+                String line;
+                while((line = reader.readLine()) != null)
+                {
+                    String[] comp = line.split(",");
+                    if(comp.length==4)
+                    {
+                        Double lat = Double.valueOf(comp[2]).doubleValue();
+                        Double lon = Double.valueOf(comp[3]).doubleValue();
+                        OverlayItem itm = new OverlayItem(comp[0], comp[1], new GeoPoint(lat, lon));
+                        try {
+                            items.addItem(itm);
+                        }
+                        catch(Exception e)
+                        {}
+                    }
+                }
+            }
+            catch(IOException e)
+            {
+            }
+
 
             return true;
+
         }
         if(item.getItemId() == R.id.save)
-        {
+        {// if pref is true
+            {
+                try
+                {
+                    PrintWriter printwriter =
+                            new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv", true));
 
+                    for(int i=0; i<items.size(); i++) //add each marker to file
+                    {
+                        OverlayItem resValues = items.getItem(i);
+                        printwriter.println(resValues.getTitle()+","+resValues.getSnippet()+","+resValues.getPoint().getLatitude()
+                                +","+resValues.getPoint().getLongitude());
+                    }
+                    printwriter.close();
+                }
+                catch (IOException e)
+                {
+                    System.out.println("Failed to add restaurants");
+                }
+            }
             return true;
         }
         return false;
@@ -138,7 +192,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener
                 String strRestaurantCuisine = extras.getString("com.example.RestaurantCuisine");
                 String strRestaurantRating = extras.getString("com.example.RestaurantRating");
                 items = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
-                OverlayItem mapMarker = new OverlayItem(strRestaurantName, "The restaurant address is:" + strRestaurantAddress +
+                OverlayItem mapMarker = new OverlayItem(strRestaurantName,
+                        "The restaurant address is:" + strRestaurantAddress +
                         "The restaurant cuisine is:" + strRestaurantCuisine +
                         "The restaurant rating is:" + strRestaurantRating, mv.getMapCenter());
                 items.addItem(mapMarker);
@@ -156,8 +211,59 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         super.onStart();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean autosave = prefs.getBoolean("autosave", true);
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv"));
+            String line;
+            while((line = reader.readLine()) != null)
+            {
+                String[] comp = line.split(",");
+                if(comp.length==4)
+                {
+                    Double lat = Double.valueOf(comp[2]).doubleValue();
+                    Double lon = Double.valueOf(comp[3]).doubleValue();
+                    OverlayItem itm = new OverlayItem(comp[0], comp[1], new GeoPoint(lat, lon));
+                    try{
+                        items.addItem(itm);
+                    }
+                    catch(Exception e)
+                    {
+                    }
 
+
+
+
+                }
+            }
+        }
+        catch(IOException e)
+        {
+        }
+
+
+
+        if(items != null)
+        {
+            if (autosave) {
+                try {
+                    PrintWriter printwriter =
+                            new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv", true));
+
+                    for (int i = 0; i < items.size(); i++) //add each marker to file
+                    {
+                        OverlayItem resValues = items.getItem(i);
+                        printwriter.println(resValues.getTitle() + "," + resValues.getSnippet() + "," + resValues.getPoint().getLatitude()
+                                + "," + resValues.getPoint().getLongitude());
+                    }
+                    printwriter.close();
+                } catch (IOException e) {
+                    System.out.println("Failed to add restaurants");
+                }
+            }
+
+        }
 
         // do something with the preference data...
     }
+
 }
