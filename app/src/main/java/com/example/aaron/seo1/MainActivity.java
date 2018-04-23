@@ -3,6 +3,7 @@ package com.example.aaron.seo1;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 public class MainActivity extends AppCompatActivity implements LocationListener
 {
     MapView mv;
-    ItemizedOverlay<OverlayItem> items;
+    ItemizedIconOverlay<OverlayItem> items;
     ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,23 +52,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener
 
             public boolean onItemSingleTapUp(int index, OverlayItem item)
             {
-                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT);
+                Toast.makeText(MainActivity.this, item.getTitle() + item.getSnippet(), Toast.LENGTH_SHORT).show();
                 return true;
             }
 
 
             public boolean onItemLongPress(int index, OverlayItem item)
             {
-                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT);
+                Toast.makeText(MainActivity.this, item.getSnippet(), Toast.LENGTH_SHORT).show();
                 return true;
             }
         };
 
-        items = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
-        OverlayItem fernhurst = new OverlayItem("Fernhurst", "the village of Fernhurst", new GeoPoint(51.05, -0.72));
-        fernhurst.setMarker(getResources().getDrawable(R.drawable.marker_default));
-        items.addItem(fernhurst);
-        mv.getOverlays().add(items);
+
 
 
     }
@@ -79,17 +76,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener
 
     public void onProviderDisabled(String provider)
     {
-        Toast.makeText(this, "Provider" + provider + "disabled", Toast.LENGTH_LONG).show();
+       // Toast.makeText(this, "Provider" + provider + "disabled", Toast.LENGTH_LONG).show();
     }
 
     public void onProviderEnabled(String provider)
     {
-        Toast.makeText(this, "Provider" + provider + "enabled", Toast.LENGTH_LONG).show();
+      //  Toast.makeText(this, "Provider" + provider + "enabled", Toast.LENGTH_LONG).show();
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras)
     {
-        Toast.makeText(this, "Status changed:" + status, Toast.LENGTH_LONG).show();
+      //  Toast.makeText(this, "Status changed:" + status, Toast.LENGTH_LONG).show();
     }
 
 // Item Menu Function
@@ -126,5 +123,41 @@ public class MainActivity extends AppCompatActivity implements LocationListener
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(requestCode==0)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                Bundle extras = data.getExtras();
+                String strRestaurantName = extras.getString("com.example.RestaurantName");
+                String strRestaurantAddress = extras.getString("com.example.RestaurantAddress");
+                String strRestaurantCuisine = extras.getString("com.example.RestaurantCuisine");
+                String strRestaurantRating = extras.getString("com.example.RestaurantRating");
+                items = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+                OverlayItem mapMarker = new OverlayItem(strRestaurantName, "The restaurant address is:" + strRestaurantAddress +
+                        "The restaurant cuisine is:" + strRestaurantCuisine +
+                        "The restaurant rating is:" + strRestaurantRating, mv.getMapCenter());
+                items.addItem(mapMarker);
+                mv.getOverlays().add(items);
+
+                // code to save to file
+            }
+
+
+        }
+    }
+
+    public void onStart()
+    {
+        super.onStart();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean autosave = prefs.getBoolean("autosave", true);
+
+
+        // do something with the preference data...
     }
 }
