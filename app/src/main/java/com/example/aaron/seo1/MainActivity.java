@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
 
+
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.addrestaurant) {
             Intent intent = new Intent(this, RestaurantActivity.class);
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             startActivityForResult(intent, 0);
             return true;
         }
+        // Load Restaurants from CSV
         if (item.getItemId() == R.id.load) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv"));
@@ -137,13 +139,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         }
                     }
                 }
-            } catch (IOException e) {
+            }
+                catch (IOException e) {
             }
 
 
             return true;
 
         }
+        // Save Restaurant Script
         if (item.getItemId() == R.id.save) {// if pref is true
             {
                 try {
@@ -198,13 +202,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv"));
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] comp = line.split(",");
-                if (comp.length == 4) {
-                    Double lat = Double.valueOf(comp[2]).doubleValue();
-                    Double lon = Double.valueOf(comp[3]).doubleValue();
-                    OverlayItem itm = new OverlayItem(comp[0], comp[1], new GeoPoint(lat, lon));
+                String[] components = line.split(",");
+                if (components.length == 4) {
+                    Double lat = Double.valueOf(components[2]).doubleValue();
+                    Double lon = Double.valueOf(components[3]).doubleValue();
+                    OverlayItem resMarker = new OverlayItem(components[0], components[1], new GeoPoint(lat, lon));
                     try {
-                        items.addItem(itm);
+                        items.addItem(resMarker);
                     } catch (Exception e) {
                     }
 
@@ -258,18 +262,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             Double lon = Double.valueOf(comp[4]).doubleValue();
                             OverlayItem itm = new OverlayItem(comp[0], comp[1], new GeoPoint(lat, lon));
 
-                                //items.addItem(itm);
-
-
-                            }
-
-
+                                items.addItem(itm);
+                        }
                         result += line;
-
-
-
-                    }
-                    return result;
+                        }
+                        return result;
                 }
                 else
 
