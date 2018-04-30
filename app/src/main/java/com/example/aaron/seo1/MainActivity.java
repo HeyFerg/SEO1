@@ -64,10 +64,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mv.setBuiltInZoomControls(true);
         mv.getController().setZoom(16);
         mv.getController().setCenter(new GeoPoint(50.91, -1.396));
-
-        download t = new download();
-        t.execute();
-
         markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
@@ -81,6 +77,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 return true;
             }
         };
+        items = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+
+        mv.getOverlays().add(items);
+        download t = new download();
+        t.execute();
+
+
 
 
     }
@@ -125,17 +128,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         // Load Restaurants from CSV
         if (item.getItemId() == R.id.load) {
             try {
-                BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv"));
+                BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv.txt"));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] comp = line.split(",");
                     if (comp.length == 4) {
-                        Double lat = Double.valueOf(comp[2]).doubleValue();
-                        Double lon = Double.valueOf(comp[3]).doubleValue();
+                        Double lat = Double.valueOf(comp[2]);
+                        Double lon = Double.valueOf(comp[3]);
                         OverlayItem itm = new OverlayItem(comp[0], comp[1], new GeoPoint(lat, lon));
                         try {
                             items.addItem(itm);
                         } catch (Exception e) {
+                            new AlertDialog.Builder(this).setMessage(e.toString()).setPositiveButton("OK", null).show();
                         }
                     }
                 }
@@ -148,13 +152,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         }
         // Save Restaurant Script
-        if (item.getItemId() == R.id.save) {// if pref is true
+        if (item.getItemId() == R.id.save) {
             {
                 try {
                     PrintWriter printwriter =
-                            new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv", true));
+                            new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv.txt"));
 
-                    for (int i = 0; i < items.size(); i++) //add each marker to file
+                    for (int i = 0; i < items.size(); i++)
                     {
                         OverlayItem resValues = items.getItem(i);
                         printwriter.println(resValues.getTitle() + "," + resValues.getSnippet() + "," + resValues.getPoint().getLatitude()
@@ -162,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     }
                     printwriter.close();
                 } catch (IOException e) {
-                    System.out.println("Failed to add restaurants");
+                    new AlertDialog.Builder(this).setMessage(e.toString()).setPositiveButton("OK", null).show();
                 }
             }
             return true;
@@ -179,68 +183,44 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 String strRestaurantAddress = extras.getString("com.example.RestaurantAddress");
                 String strRestaurantCuisine = extras.getString("com.example.RestaurantCuisine");
                 String strRestaurantRating = extras.getString("com.example.RestaurantRating");
-                items = new ItemizedIconOverlay<>(this, new ArrayList<OverlayItem>(), markerGestureListener);
+
                 OverlayItem mapMarker = new OverlayItem(strRestaurantName,
                         "The restaurant address is:" + strRestaurantAddress +
                                 "The restaurant cuisine is:" + strRestaurantCuisine +
                                 "The restaurant rating is:" + strRestaurantRating, mv.getMapCenter());
                 items.addItem(mapMarker);
-                mv.getOverlays().add(items);
 
-                // code to save to file
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean autosave = prefs.getBoolean("autosave", true);
+                if (items != null) {
+                    if (autosave) {
+                        try {
+                            PrintWriter printwriter =
+                                    new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv.txt"));
+
+                            for (int i = 0; i < items.size(); i++) //add each marker to file
+                            {
+                                OverlayItem resValues = items.getItem(i);
+                                printwriter.println(resValues.getTitle() + "," + resValues.getSnippet() + "," + resValues.getPoint().getLatitude()
+                                        + "," + resValues.getPoint().getLongitude());
+                            }
+                            printwriter.close();
+                        } catch (IOException e) {
+                            new AlertDialog.Builder(this).setMessage(e.toString()).setPositiveButton("OK", null).show();
+                        }
+                    }
+
+                }
+
+
+
+
             }
 
 
         }
     }
 
-    public void onStart() {
-        super.onStart();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        boolean autosave = prefs.getBoolean("autosave", true);
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv"));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] components = line.split(",");
-                if (components.length == 4) {
-                    Double lat = Double.valueOf(components[2]).doubleValue();
-                    Double lon = Double.valueOf(components[3]).doubleValue();
-                    OverlayItem resMarker = new OverlayItem(components[0], components[1], new GeoPoint(lat, lon));
-                    try {
-                        items.addItem(resMarker);
-                    } catch (Exception e) {
-                    }
-
-
-                }
-            }
-        } catch (IOException e) {
-        }
-
-
-        if (items != null) {
-            if (autosave) {
-                try {
-                    PrintWriter printwriter =
-                            new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/addedRestaurants.csv", true));
-
-                    for (int i = 0; i < items.size(); i++) //add each marker to file
-                    {
-                        OverlayItem resValues = items.getItem(i);
-                        printwriter.println(resValues.getTitle() + "," + resValues.getSnippet() + "," + resValues.getPoint().getLatitude()
-                                + "," + resValues.getPoint().getLongitude());
-                    }
-                    printwriter.close();
-                } catch (IOException e) {
-                    System.out.println("Failed to add restaurants");
-                }
-            }
-
-        }
-
-
-    }
 
     class download extends AsyncTask<Void, Void, String> {
         public String doInBackground(Void... unused) {
@@ -260,9 +240,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         if (comp.length == 6) {
                             Double lat = Double.valueOf(comp[5]).doubleValue();
                             Double lon = Double.valueOf(comp[4]).doubleValue();
-                            OverlayItem itm = new OverlayItem(comp[0], comp[1], new GeoPoint(lat, lon));
+                            OverlayItem item = new OverlayItem(comp[0], comp[1], new GeoPoint(lat, lon));
 
-                                items.addItem(itm);
+                                items.addItem(item);
                         }
                         result += line;
                         }
