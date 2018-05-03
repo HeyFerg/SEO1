@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         public String doInBackground(Void... unused) {
             HttpURLConnection conn = null;
             try {
-                URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=18&username=user002&format=csv");
+                URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=18&username=user014&format=csv");
                 conn = (HttpURLConnection) url.openConnection();
                 InputStream in = conn.getInputStream();
 
